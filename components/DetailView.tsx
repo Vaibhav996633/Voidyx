@@ -83,6 +83,25 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
         </div>
 
         <div className="flex-1 p-10 space-y-12">
+          {/* Tech Specs Section */}
+          <section className="bg-white/[0.02] p-6 border border-white/[0.05] space-y-4">
+             <h3 className="text-[10px] font-mono font-black text-zinc-500 uppercase tracking-widest">Technical Specifications</h3>
+             <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                   <p className="text-[8px] font-mono text-zinc-700 uppercase">Complexity</p>
+                   <p className="text-[10px] font-mono text-white">{animation.complexity}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[8px] font-mono text-zinc-700 uppercase">Category</p>
+                   <p className="text-[10px] font-mono text-white">/{animation.category}/</p>
+                </div>
+                <div className="col-span-2 space-y-1 border-t border-white/[0.03] pt-4">
+                   <p className="text-[8px] font-mono text-zinc-700 uppercase">Telemetry Note</p>
+                   <p className="text-[10px] font-mono text-zinc-400 italic">"{animation.performanceNote || 'Standard performance footprint.'}"</p>
+                </div>
+             </div>
+          </section>
+
           <section className="space-y-10">
             {animation.config?.map((param) => (
               <div key={param.id} className="space-y-4">
@@ -108,6 +127,7 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
                     step={param.step} 
                     value={config[param.id]} 
                     onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} 
+                    className="w-full"
                   />
                 )}
               </div>

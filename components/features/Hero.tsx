@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AnimationCard from '../AnimationCard';
 import { AnimationEntry } from '../../types';
 
@@ -9,60 +9,116 @@ interface HeroProps {
   onEnterGallery: () => void;
 }
 
+const ScrambleText: React.FC<{ text: string; delay?: number; className?: string }> = ({ text, delay = 0, className = "" }) => {
+  const [displayText, setDisplayText] = useState("");
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  useEffect(() => {
+    let timeout: any;
+    let iterations = 0;
+    
+    timeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        setDisplayText(prev => 
+          text.split("").map((char, index) => {
+            if (index < iterations) return char;
+            return chars[Math.floor(Math.random() * chars.length)];
+          }).join("")
+        );
+
+        if (iterations >= text.length) clearInterval(interval);
+        iterations += 1/3;
+      }, 30);
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  }, [text, delay]);
+
+  return <span className={className}>{displayText || text.replace(/./g, ' ')}</span>;
+};
+
 const Hero: React.FC<HeroProps> = ({ featuredAnimations, onSelect, onEnterGallery }) => {
   return (
-    <main className="flex-1 pt-56 pb-40 px-8 relative z-10">
-      <div className="max-w-7xl mx-auto space-y-48">
-        <header className="text-center space-y-12 max-w-6xl mx-auto">
-          <div className="reveal-1 inline-flex items-center gap-3 bg-white/[0.03] backdrop-blur-xl px-6 py-2.5 rounded-full text-[9px] font-black text-zinc-500 tracking-[0.5em] uppercase border border-white/[0.05]">
-            <span className="w-1 h-1 bg-white rounded-full animate-pulse shadow-[0_0_8px_white]"></span>
-            Visions from the Void
+    <main className="flex-1 min-h-screen relative z-10 pt-24 md:pt-36">
+      <div className="max-w-[1440px] mx-auto px-8 lg:px-20">
+        
+        {/* Main Header Container */}
+        <section className="space-y-12">
+          {/* Title Row */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 reveal" style={{ animationDelay: '0.1s' }}>
+              <span className="w-10 h-[1px] bg-white/10"></span>
+              <p className="font-mono text-[9px] uppercase tracking-[0.6em] text-white/40">Premium Motion Registry</p>
+            </div>
+            <h1 className="text-[15vw] md:text-[18rem] text-hero select-none reveal" style={{ animationDelay: '0.2s' }}>
+              <ScrambleText text="VOIDYX" delay={300} />
+            </h1>
           </div>
-          
-          <h1 className="text-7xl md:text-[12rem] font-heading font-black leading-[0.75] tracking-[-0.07em] text-white">
-            <span className="reveal-2 block">Cinematic</span>
-            <span className="reveal-3 block text-outline mt-4">Interfaces.</span>
-          </h1>
-          
-          <p className="reveal-4 text-xl md:text-2xl text-zinc-500 max-w-2xl mx-auto leading-relaxed font-light tracking-tight px-4">
-            A specialized motion foundry for high-fidelity generative primitives. Surfaces crafted for absolute visual immersion.
-          </p>
-          
-          <div className="reveal-5 pt-10">
-            <button 
-              onClick={onEnterGallery} 
-              className="group relative bg-white text-black px-16 py-6 rounded-full font-black text-[12px] uppercase tracking-[0.6em] hover:bg-zinc-100 transition-all shadow-[0_20px_50px_rgba(255,255,255,0.15)] active:scale-95"
-            >
-              Enter the Vault
-              <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-30 blur-2xl transition-opacity"></div>
-            </button>
-          </div>
-        </header>
 
-        <section className="space-y-24 reveal-5">
-          <div className="flex justify-between items-end gap-6 border-b border-white/[0.05] pb-12">
-            <div className="space-y-4">
-               <h2 className="text-4xl font-heading font-black tracking-tight text-white uppercase italic">Active Units</h2>
-               <div className="flex items-center gap-4">
-                 <span className="text-[9px] font-mono text-white tracking-widest uppercase bg-white/5 px-3 py-1 rounded border border-white/10">Batch 01</span>
-                 <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">Registry Sync: Stable</p>
-               </div>
+          {/* Description & CTA Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start reveal" style={{ animationDelay: '0.6s' }}>
+            <div className="lg:col-span-7">
+              <h2 className="text-4xl md:text-6xl text-accent">
+                Premium motion effects <br/>
+                <span className="text-zinc-600 italic font-light">without the complexity.</span>
+              </h2>
+            </div>
+            <div className="lg:col-span-5 space-y-8">
+              <p className="text-base text-zinc-500 font-light leading-relaxed max-w-md">
+                Carefully crafted, optimized web animations with live previews and clean, copy-paste-ready code. Bring immersive visuals to modern interfaces instantly.
+              </p>
+              <button 
+                onClick={onEnterGallery} 
+                className="btn-premium group"
+              >
+                Access Vault
+                <svg className="w-4 h-4 ml-3 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Registry Selection */}
+        <section className="mt-32 space-y-12 pb-24">
+          <div className="flex justify-between items-center border-b border-white/5 pb-8 reveal" style={{ animationDelay: '0.8s' }}>
+            <div className="flex items-baseline gap-4">
+              <span className="text-[10px] font-mono text-zinc-800">01</span>
+              <h3 className="text-2xl font-heading font-black text-white uppercase tracking-tighter">Registry</h3>
             </div>
             <button 
               onClick={onEnterGallery} 
-              className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-zinc-500 hover:text-white transition-all"
+              className="text-[9px] font-bold uppercase tracking-[0.4em] text-zinc-600 hover:text-white transition-all py-2"
             >
-              Access Vault 
-              <div className="w-10 h-[1px] bg-zinc-800 group-hover:w-14 group-hover:bg-white transition-all"></div>
+              Explore All
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredAnimations.map((anim, idx) => (
-              <div key={anim.id} className={`reveal-${Math.min(5, idx + 3)}`}>
+              <div 
+                key={anim.id} 
+                className="reveal" 
+                style={{ animationDelay: `${1.0 + (idx * 0.1)}s` }}
+              >
                 <AnimationCard animation={anim} onClick={onSelect} />
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Minimal Footer Accent */}
+        <section className="py-24 border-t border-white/5 reveal" style={{ animationDelay: '1.2s' }}>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            <h4 className="text-xl font-heading font-black text-white/20 uppercase tracking-widest italic">
+              Motion from the Void.
+            </h4>
+            <div className="flex gap-2">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-1 h-1 bg-white/10"></div>
+              ))}
+            </div>
           </div>
         </section>
       </div>
