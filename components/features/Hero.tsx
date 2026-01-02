@@ -76,10 +76,7 @@ const Hero: React.FC<HeroProps> = ({ featuredAnimations, onSelect, onEnterGaller
           </div>
         </div>
 
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-0 animate-[reveal-up_1s_ease-out_2s_forwards]">
-          <span className="text-[8px] font-mono text-zinc-600 uppercase tracking-[0.6em] whitespace-nowrap">Initialize Registry</span>
-          <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent"></div>
-        </div>
+
       </section>
 
       <div className="w-full max-w-[1920px] mx-auto space-y-24 sm:space-y-40 pb-32">

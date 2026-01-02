@@ -11,6 +11,22 @@ interface CinematicStackProps {
 const CinematicStack: React.FC<CinematicStackProps> = ({ animations, onSelect }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const autoPlayRef = useRef<number>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+
+    const update = () => setIsMobile(mq.matches);
+    update();
+
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', update);
+      return () => mq.removeEventListener('change', update);
+    }
+
+    mq.addListener(update);
+    return () => mq.removeListener(update);
+  }, []);
 
   useEffect(() => {
     const next = () => {
@@ -42,7 +58,7 @@ const CinematicStack: React.FC<CinematicStackProps> = ({ animations, onSelect })
           const opacity = Math.max(0, 1 - absRel * 0.45);
           const z = isActive ? 150 : -absRel * 200;
           // Responsive horizontal spacing
-          const xOffset = window.innerWidth < 640 ? 180 : 350;
+          const xOffset = isMobile ? 180 : 350;
           const x = relIndex * xOffset;
           const rotateY = relIndex * -12;
           const scale = isActive ? 1 : 0.75 - (absRel * 0.05);
@@ -70,31 +86,33 @@ const CinematicStack: React.FC<CinematicStackProps> = ({ animations, onSelect })
                   <div className="absolute inset-0 z-40 pointer-events-none ring-1 ring-inset ring-white/20 animate-pulse"></div>
                 )}
 
-                <div className="absolute inset-0 opacity-70 group-hover:opacity-100 transition-opacity">
-                   <Sandbox 
+                {/* Inner Frame */}
+                <div className="absolute inset-4 sm:inset-6 z-30 pointer-events-none border border-white/10"></div>
+
+                <div className="absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <Sandbox 
                     animation={anim} 
                     isThumbnail={true} 
                     currentConfig={defaultConfig}
-                    className="scale-110"
                   />
                 </div>
 
                 <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-transparent to-transparent"></div>
                 
-                <div className={`absolute bottom-0 left-0 right-0 p-4 sm:p-8 z-30 transition-all duration-700 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                <div className={`absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 z-40 transition-all duration-700 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
                    <div className="flex justify-between items-end">
                       <div className="space-y-0.5 sm:space-y-1">
                         <span className="text-[7px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-[0.3em]">{anim.category}</span>
                         <h3 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black text-white uppercase tracking-tighter italic leading-none">{anim.name}</h3>
                       </div>
-                      <div className="hidden sm:block text-[8px] font-mono text-white/20 uppercase tracking-widest border border-white/10 px-2 py-0.5">
+                      <div className="text-[8px] font-mono text-white/20 uppercase tracking-widest border border-white/10 px-2 py-0.5">
                         MOD_0{i + 1}
                       </div>
                    </div>
                 </div>
 
-                <div className="absolute top-2 left-2 w-6 h-[1px] bg-white/20 z-40"></div>
-                <div className="absolute top-2 left-2 w-[1px] h-6 bg-white/20 z-40"></div>
+                <div className="absolute top-4 left-4 sm:top-6 sm:left-6 w-4 sm:w-5 h-[1px] bg-white/20 z-40"></div>
+                <div className="absolute top-4 left-4 sm:top-6 sm:left-6 w-[1px] h-4 sm:h-5 bg-white/20 z-40"></div>
               </div>
             </div>
           );
