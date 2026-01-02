@@ -63,39 +63,64 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
 
   return (
     <div className="fixed inset-0 z-[60] bg-black flex overflow-hidden">
-      <div className="flex-1 relative bg-[#050505]">
+      <div className="flex-1 relative bg-black">
         <Sandbox animation={animation} currentConfig={config} />
         <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start pointer-events-none">
-          <button onClick={onBack} className="pointer-events-auto flex items-center gap-3 text-white/50 hover:text-white transition-all bg-black/60 px-8 py-4 rounded-2xl border border-white/10">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-            <span className="font-bold text-sm tracking-tight uppercase">Gallery</span>
+          <button onClick={onBack} className="pointer-events-auto flex items-center gap-3 text-white/40 hover:text-white transition-all bg-black/80 backdrop-blur-xl px-6 py-3 rounded-full border border-white/[0.05]">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            <span className="font-bold text-[9px] tracking-[0.2em] uppercase">Return to Gallery</span>
           </button>
         </div>
       </div>
 
-      <aside className={`w-[520px] bg-[#0a0a0a]/95 backdrop-blur-3xl border-l border-white/10 h-screen overflow-y-auto flex flex-col transition-transform duration-700 ${panelVisible ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="sticky top-0 z-20 bg-[#0a0a0a]/90 p-12 border-b border-white/5">
-           <h2 className="text-3xl font-heading font-black text-white tracking-tight uppercase">Parametrize</h2>
+      <aside className={`w-[480px] bg-[#0a0a0a] border-l border-white/[0.03] h-screen overflow-y-auto flex flex-col transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${panelVisible ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="sticky top-0 z-20 bg-[#0a0a0a]/80 backdrop-blur-xl p-10 border-b border-white/[0.03] flex justify-between items-center">
+           <div>
+             <h2 className="text-xl font-heading font-black text-white tracking-tight uppercase">Parameter Stack</h2>
+             <p className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Modulating {animation.id}</p>
+           </div>
+           <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_white]"></div>
         </div>
 
-        <div className="flex-1 p-12 space-y-16">
-          <section className="space-y-12">
+        <div className="flex-1 p-10 space-y-12">
+          <section className="space-y-10">
             {animation.config?.map((param) => (
-              <div key={param.id} className="space-y-5">
-                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em]">{param.label}</label>
+              <div key={param.id} className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em]">{param.label}</label>
+                  <span className="text-[8px] font-mono text-zinc-700">{config[param.id]}</span>
+                </div>
                 {param.type === 'color' ? (
-                  <input type="color" value={config[param.id]} onChange={(e) => handleConfigChange(param.id, e.target.value)} className="w-full h-12 bg-transparent border-none outline-none cursor-pointer" />
+                  <div className="flex items-center gap-4">
+                    <input 
+                      type="color" 
+                      value={config[param.id]} 
+                      onChange={(e) => handleConfigChange(param.id, e.target.value)} 
+                      className="w-full h-8 bg-transparent border-none outline-none cursor-pointer rounded-none" 
+                    />
+                    <div className="text-[10px] font-mono text-zinc-600 uppercase">{config[param.id]}</div>
+                  </div>
                 ) : (
-                  <input type="range" min={param.min} max={param.max} step={param.step} value={config[param.id]} onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} className="w-full" />
+                  <input 
+                    type="range" 
+                    min={param.min} 
+                    max={param.max} 
+                    step={param.step} 
+                    value={config[param.id]} 
+                    onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} 
+                  />
                 )}
               </div>
             ))}
           </section>
 
-          <section className="space-y-10 pt-12 border-t border-white/5">
-            <CodeBlock label="Voidyx Bundle" code={generatedHtmlSnippet} language="html" />
-            <button onClick={handleCopyFull} className={`w-full font-black py-7 rounded-[2.5rem] transition-all text-[11px] uppercase tracking-[0.4em] ${copied ? 'bg-emerald-500 text-white' : 'bg-white text-black hover:bg-zinc-200'}`}>
-              {copied ? 'Copied ✓' : 'Copy Motion Bundle'}
+          <section className="space-y-8 pt-10 border-t border-white/[0.03]">
+            <CodeBlock label="Production Bundle" code={generatedHtmlSnippet} language="html" />
+            <button 
+              onClick={handleCopyFull} 
+              className={`w-full font-black py-6 rounded-full transition-all text-[10px] uppercase tracking-[0.4em] ${copied ? 'bg-zinc-800 text-white' : 'bg-white text-black hover:bg-zinc-100 shadow-[0_10px_30px_rgba(255,255,255,0.05)]'}`}
+            >
+              {copied ? 'Copied to Buffer' : 'Export Movement'}
             </button>
           </section>
         </div>
