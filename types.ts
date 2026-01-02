@@ -29,7 +29,8 @@ export interface AnimationEntry {
 }
 
 export interface AppState {
-  view: 'gallery' | 'detail';
+  // Added 'home' view to the AppState interface to allow navigating to the landing page/manifesto
+  view: 'home' | 'gallery' | 'detail';
   selectedId: string | null;
   searchQuery: string;
   selectedCategory: Category | 'All';
