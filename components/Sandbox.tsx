@@ -1,4 +1,3 @@
-
 import React, { useMemo, useRef } from 'react';
 import { AnimationEntry } from '../types';
 
@@ -39,7 +38,18 @@ const Sandbox: React.FC<SandboxProps> = ({ animation, className, isThumbnail = f
 
   return (
     <div className={`relative w-full h-full overflow-hidden bg-black ${className}`}>
-      <iframe key={`${animation.id}-${configString}`} ref={iframeRef} srcDoc={srcDoc} className="w-full h-full border-none" sandbox="allow-scripts" />
+      <iframe 
+        key={`${animation.id}-${configString}`} 
+        ref={iframeRef} 
+        srcDoc={srcDoc} 
+        className="w-full h-full border-none block" 
+        sandbox="allow-scripts"
+        onLoad={() => {
+          if (iframeRef.current) {
+            iframeRef.current.style.opacity = '1';
+          }
+        }}
+      />
       {isThumbnail && <div className="absolute inset-0 z-10 bg-transparent cursor-pointer" />}
     </div>
   );

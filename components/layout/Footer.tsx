@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
              <div className="font-heading font-black text-4xl text-white uppercase tracking-tighter">VOIDYX</div>
              <p className="text-zinc-600 font-light text-sm leading-relaxed max-w-sm">
-                Premium web motion foundry built for developers who demand cinematic high-fidelity primitives without the overhead.
+                A premium animation platform built for modern developers. High-performance web motion with real-time previews and cinematic code.
              </p>
           </div>
           <div className="flex gap-8 items-center text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
       <div className="max-w-[1440px] mx-auto mt-40 pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between gap-10">
         <div className="flex flex-col gap-1">
           <p className="text-[9px] font-mono text-zinc-700 uppercase tracking-[0.6em]">© 2025 VOIDYX SYSTEMS INT.</p>
-          <p className="text-[7px] font-mono text-zinc-800 uppercase tracking-[0.4em]">FORGED IN THE VOID // MOTION_TYPE_PRIMARY</p>
+          <p className="text-[7px] font-mono text-zinc-800 uppercase tracking-[0.4em]">VOIDYX — MOTION FROM THE VOID.</p>
         </div>
         <div className="flex gap-12 text-[9px] font-mono text-zinc-700 uppercase tracking-[0.6em] items-center">
           <a href="#" className="hover:text-white transition-colors">Privacy</a>

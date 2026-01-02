@@ -22,7 +22,7 @@ export const useGallery = () => {
     });
   }, [state.searchQuery, state.selectedCategory]);
 
-  const featuredAnimations = useMemo(() => ANIMATIONS.slice(0, 3), []);
+  const featuredAnimations = useMemo(() => ANIMATIONS.slice(0, 6), []);
 
   const selectedAnimation = useMemo(() => {
     return ANIMATIONS.find(a => a.id === state.selectedId);

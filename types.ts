@@ -1,4 +1,3 @@
-
 export type Category = 'Background' | 'Interactive' | 'Particle' | 'WebGL' | 'Text';
 
 export type ConfigType = 'color' | 'number' | 'select' | 'boolean';
@@ -25,11 +24,10 @@ export interface AnimationEntry {
   cdnLinks?: string[];
   performanceNote?: string;
   complexity: 'Simple' | 'Medium' | 'High';
-  config?: ConfigParam[]; // New: defines customizable parameters
+  config?: ConfigParam[];
 }
 
 export interface AppState {
-  // Added 'home' view to the AppState interface to allow navigating to the landing page/manifesto
   view: 'home' | 'gallery' | 'detail';
   selectedId: string | null;
   searchQuery: string;

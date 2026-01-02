@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { AnimationEntry } from '../types';
 import Sandbox from './Sandbox';
@@ -20,6 +19,7 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
 
   const [panelVisible, setPanelVisible] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setPanelVisible(true), 50);
@@ -62,89 +62,181 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black flex overflow-hidden">
-      <div className="flex-1 relative bg-black">
-        <Sandbox animation={animation} currentConfig={config} />
-        <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-start pointer-events-none">
-          <button onClick={onBack} className="pointer-events-auto flex items-center gap-3 text-white/40 hover:text-white transition-all bg-black/80 backdrop-blur-xl px-6 py-3 rounded-full border border-white/[0.05]">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-            <span className="font-bold text-[9px] tracking-[0.2em] uppercase">Return to Gallery</span>
+    <div className="fixed inset-0 z-[500] bg-black flex flex-col lg:flex-row overflow-hidden">
+      
+      {/* PREVIEW ZONE */}
+      <section 
+        className={`relative transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] bg-black ${
+          isFullScreen 
+            ? 'fixed inset-0 z-[550] w-full h-full' 
+            : 'h-[40vh] lg:h-full lg:flex-1 z-[510]'
+        }`}
+      >
+        <div className="absolute inset-0 w-full h-full">
+          {/* Removed key so it doesn't reload on fullscreen toggle, making it smoother */}
+          <Sandbox 
+            animation={animation} 
+            currentConfig={config} 
+          />
+        </div>
+        
+        {/* Navigation & Actions Overlay */}
+        <div className="absolute top-0 left-0 right-0 p-4 sm:p-10 flex justify-between items-start pointer-events-none z-[600]">
+          {!isFullScreen && (
+            <button 
+              onClick={onBack} 
+              className="pointer-events-auto group flex items-center gap-2 sm:gap-4 text-white/50 hover:text-white transition-all bg-black/60 backdrop-blur-md px-4 py-2 sm:px-6 sm:py-3 border border-white/10 rounded-none shadow-2xl"
+            >
+              <svg className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em]">Back</span>
+            </button>
+          )}
+
+          <button 
+            onClick={() => setIsFullScreen(!isFullScreen)}
+            className={`pointer-events-auto group flex items-center gap-2 sm:gap-4 transition-all bg-black/80 backdrop-blur-xl px-4 py-2 sm:px-5 sm:py-3 border border-white/20 rounded-none shadow-2xl ${
+              isFullScreen ? 'text-white hover:bg-white hover:text-black border-white/40' : 'text-white/50 hover:text-white'
+            } ml-auto`}
+          >
+            {isFullScreen ? (
+              <>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em]">Close Full Screen</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+                <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em] hidden sm:inline">Full Screen</span>
+              </>
+            )}
           </button>
         </div>
-      </div>
 
-      <aside className={`w-[480px] bg-[#0a0a0a] border-l border-white/[0.03] h-screen overflow-y-auto flex flex-col transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${panelVisible ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="sticky top-0 z-20 bg-[#0a0a0a]/80 backdrop-blur-xl p-10 border-b border-white/[0.03] flex justify-between items-center">
-           <div>
-             <h2 className="text-xl font-heading font-black text-white tracking-tight uppercase">Parameter Stack</h2>
-             <p className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Modulating {animation.id}</p>
+        {/* Viewport Accents - Hidden in Fullscreen */}
+        {!isFullScreen && (
+          <>
+            <div className="absolute inset-0 border-[30px] border-black pointer-events-none z-40 hidden xl:block"></div>
+            <div className="absolute inset-4 lg:inset-8 border border-white/5 pointer-events-none z-40"></div>
+            
+            {/* Bottom Status Bar - Desktop Only */}
+            <div className="absolute bottom-12 left-12 right-12 hidden lg:flex justify-between items-end pointer-events-none z-40">
+               <div className="flex flex-col gap-1">
+                 <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.8em]">Unit Output</span>
+                 <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Active Render // 60 FPS</span>
+               </div>
+               <div className="h-[1px] flex-1 mx-12 bg-white/5 mb-2"></div>
+               <div className="text-[8px] font-mono text-white/20 uppercase tracking-[0.8em]">Coordinate System v4.1</div>
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* CUSTOMIZATION PANEL */}
+      <aside 
+        className={`bg-[#080808] border-l lg:border-t-0 border-t border-white/[0.05] overflow-y-auto flex flex-col transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isFullScreen 
+            ? 'h-0 w-0 lg:w-0 lg:h-full opacity-0 pointer-events-none' 
+            : 'h-[60vh] w-full lg:h-full lg:w-[480px] opacity-100'
+        } z-[520]`}
+      >
+        <header className="sticky top-0 z-20 bg-[#080808]/95 backdrop-blur-xl p-6 lg:p-10 border-b border-white/[0.05] flex justify-between items-center">
+           <div className="space-y-1">
+             <div className="text-[8px] lg:text-[9px] font-mono text-emerald-500 uppercase tracking-[0.4em] mb-1">Module Online</div>
+             <h2 className="text-xl lg:text-2xl font-heading font-black text-white tracking-tighter uppercase leading-none">{animation.name}</h2>
            </div>
-           <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_white]"></div>
-        </div>
+           <div className="flex flex-col items-end gap-1">
+             <div className="text-[7px] lg:text-[8px] font-mono text-zinc-600 uppercase tracking-widest">UNIT_{animation.id.slice(0,3).toUpperCase()}</div>
+             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.4)]"></div>
+           </div>
+        </header>
 
-        <div className="flex-1 p-10 space-y-12">
-          {/* Tech Specs Section */}
-          <section className="bg-white/[0.02] p-6 border border-white/[0.05] space-y-4">
-             <h3 className="text-[10px] font-mono font-black text-zinc-500 uppercase tracking-widest">Technical Specifications</h3>
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                   <p className="text-[8px] font-mono text-zinc-700 uppercase">Complexity</p>
-                   <p className="text-[10px] font-mono text-white">{animation.complexity}</p>
-                </div>
-                <div className="space-y-1">
-                   <p className="text-[8px] font-mono text-zinc-700 uppercase">Category</p>
-                   <p className="text-[10px] font-mono text-white">/{animation.category}/</p>
-                </div>
-                <div className="col-span-2 space-y-1 border-t border-white/[0.03] pt-4">
-                   <p className="text-[8px] font-mono text-zinc-700 uppercase">Telemetry Note</p>
-                   <p className="text-[10px] font-mono text-zinc-400 italic">"{animation.performanceNote || 'Standard performance footprint.'}"</p>
-                </div>
+        <div className="flex-1 p-6 lg:p-10 space-y-8 lg:space-y-12">
+          <div className="grid grid-cols-2 gap-px bg-white/5 border border-white/5">
+             <div className="bg-[#0c0c0c] p-4 lg:p-5 flex flex-col gap-1 lg:gap-2">
+                <span className="text-[6px] lg:text-[7px] font-mono text-zinc-600 uppercase tracking-widest">Complexity</span>
+                <span className="text-[9px] lg:text-[10px] font-mono text-white uppercase tracking-wider">{animation.complexity}</span>
              </div>
-          </section>
+             <div className="bg-[#0c0c0c] p-4 lg:p-5 flex flex-col gap-1 lg:gap-2">
+                <span className="text-[6px] lg:text-[7px] font-mono text-zinc-600 uppercase tracking-widest">Platform</span>
+                <span className="text-[9px] lg:text-[10px] font-mono text-white uppercase tracking-wider">{animation.category}</span>
+             </div>
+          </div>
 
-          <section className="space-y-10">
+          <section className="space-y-8 lg:space-y-12">
+            <div className="flex items-center gap-4">
+               <h3 className="text-[9px] lg:text-[10px] font-mono font-black text-white uppercase tracking-[0.4em]">Configuration</h3>
+               <div className="h-[1px] flex-1 bg-white/[0.03]"></div>
+            </div>
+            
             {animation.config?.map((param) => (
-              <div key={param.id} className="space-y-4">
+              <div key={param.id} className="space-y-4 lg:space-y-5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em]">{param.label}</label>
-                  <span className="text-[8px] font-mono text-zinc-700">{config[param.id]}</span>
+                  <label className="text-[9px] lg:text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em]">{param.label}</label>
+                  <span className="text-[8px] lg:text-[9px] font-mono text-white tracking-widest border border-white/10 px-2 py-1 bg-white/[0.02] shadow-inner">{config[param.id]}</span>
                 </div>
+                
                 {param.type === 'color' ? (
-                  <div className="flex items-center gap-4">
+                  <div className="relative group p-1 border border-white/[0.03] bg-black">
                     <input 
                       type="color" 
                       value={config[param.id]} 
                       onChange={(e) => handleConfigChange(param.id, e.target.value)} 
-                      className="w-full h-8 bg-transparent border-none outline-none cursor-pointer rounded-none" 
+                      className="w-full h-10 lg:h-12 bg-transparent cursor-pointer p-0 appearance-none outline-none border-none" 
                     />
-                    <div className="text-[10px] font-mono text-zinc-600 uppercase">{config[param.id]}</div>
+                    <div className="absolute inset-0 pointer-events-none border border-white/0 group-hover:border-white/10 transition-colors"></div>
                   </div>
                 ) : (
-                  <input 
-                    type="range" 
-                    min={param.min} 
-                    max={param.max} 
-                    step={param.step} 
-                    value={config[param.id]} 
-                    onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} 
-                    className="w-full"
-                  />
+                  <div className="relative pt-2">
+                    <input 
+                      type="range" 
+                      min={param.min} 
+                      max={param.max} 
+                      step={param.step} 
+                      value={config[param.id]} 
+                      onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} 
+                      className="w-full h-[2px] bg-zinc-800 rounded-none appearance-none cursor-pointer accent-white hover:accent-emerald-400 transition-all"
+                    />
+                    <div className="flex justify-between mt-2">
+                       <span className="text-[6px] lg:text-[7px] font-mono text-zinc-700">{param.min}</span>
+                       <span className="text-[6px] lg:text-[7px] font-mono text-zinc-700">{param.max}</span>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
           </section>
 
-          <section className="space-y-8 pt-10 border-t border-white/[0.03]">
-            <CodeBlock label="Production Bundle" code={generatedHtmlSnippet} language="html" />
+          <section className="space-y-6 lg:space-y-8 pt-8 lg:pt-10 border-t border-white/[0.03]">
+             <div className="flex items-center gap-4 mb-4">
+               <h3 className="text-[9px] lg:text-[10px] font-mono font-black text-white uppercase tracking-[0.4em]">Protocol Export</h3>
+               <div className="h-[1px] flex-1 bg-white/[0.03]"></div>
+            </div>
+            
+            <CodeBlock label="Deployable Code" code={generatedHtmlSnippet} language="html" />
+            
             <button 
               onClick={handleCopyFull} 
-              className={`w-full font-black py-6 rounded-full transition-all text-[10px] uppercase tracking-[0.4em] ${copied ? 'bg-zinc-800 text-white' : 'bg-white text-black hover:bg-zinc-100 shadow-[0_10px_30px_rgba(255,255,255,0.05)]'}`}
+              className={`w-full font-black py-5 lg:py-7 transition-all text-[10px] lg:text-[11px] uppercase tracking-[0.5em] border ${
+                copied 
+                ? 'bg-emerald-900/10 text-emerald-400 border-emerald-500/20' 
+                : 'bg-white text-black hover:bg-zinc-200 border-white shadow-[0_20px_40px_rgba(255,255,255,0.05)]'
+              }`}
             >
-              {copied ? 'Copied to Buffer' : 'Export Movement'}
+              {copied ? 'Buffer Synced ✓' : 'Copy System Specs'}
             </button>
           </section>
         </div>
       </aside>
+
+      {/* Global Accents */}
+      <div className="fixed top-0 bottom-0 left-0 w-[1px] bg-white/5 pointer-events-none z-[610] hidden sm:block"></div>
+      <div className="fixed top-0 bottom-0 right-0 w-[1px] bg-white/5 pointer-events-none z-[610] hidden sm:block"></div>
     </div>
   );
 };

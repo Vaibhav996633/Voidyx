@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface NavbarProps {
@@ -23,21 +22,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
         </div>
         
         {/* Navigation - Precise */}
-        <div className="flex items-center gap-12 md:gap-20">
+        <div className="flex items-center gap-12">
           <button 
             onClick={() => onNavigate('gallery')} 
             className={`text-[9px] font-black uppercase tracking-[0.6em] transition-all relative group py-2 ${currentView === 'gallery' ? 'text-white' : 'text-zinc-600 hover:text-white'}`}
           >
             Vault
             <span className={`absolute bottom-0 left-0 h-[1px] bg-white transition-all duration-500 ${currentView === 'gallery' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
-          </button>
-          
-          <button 
-            onClick={() => onNavigate('home')} 
-            className={`text-[9px] font-black uppercase tracking-[0.6em] transition-all relative group py-2 ${currentView === 'home' ? 'text-white' : 'text-zinc-600 hover:text-white'}`}
-          >
-            Mission
-            <span className={`absolute bottom-0 left-0 h-[1px] bg-white transition-all duration-500 ${currentView === 'home' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
           </button>
         </div>
       </div>
