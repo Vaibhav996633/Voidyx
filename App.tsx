@@ -4,6 +4,7 @@ import Footer from './components/layout/Footer';
 import Hero from './components/features/Hero';
 import AnimationCard from './components/AnimationCard';
 import DetailView from './components/DetailView';
+import LegalView from './components/LegalView';
 import { useGallery } from './hooks/useGallery';
 import { Category } from './types';
 
@@ -24,8 +25,8 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-[#050505] flex flex-col selection:bg-white selection:text-black">
       {/* Global Navigation */}
       <Navbar 
-        currentView={state.view} 
-        onNavigate={(view) => setView(view)} 
+        currentView={state.view as any} 
+        onNavigate={(view) => setView(view as any)} 
       />
 
       {/* View Orchestration */}
@@ -109,7 +110,14 @@ const App: React.FC = () => {
         />
       )}
 
-      <Footer />
+      {(state.view === 'privacy' || state.view === 'terms') && (
+        <LegalView 
+          type={state.view} 
+          onBack={() => setView('home')} 
+        />
+      )}
+
+      <Footer onNavigate={(view) => setView(view as any)} />
     </div>
   );
 };

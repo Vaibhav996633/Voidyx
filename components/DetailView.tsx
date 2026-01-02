@@ -69,11 +69,10 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
         className={`relative transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] bg-black ${
           isFullScreen 
             ? 'fixed inset-0 z-[550] w-full h-full' 
-            : 'h-[40vh] lg:h-full lg:flex-1 z-[510]'
+            : 'h-[45vh] lg:h-full lg:flex-1 z-[510]'
         }`}
       >
         <div className="absolute inset-0 w-full h-full">
-          {/* Removed key so it doesn't reload on fullscreen toggle, making it smoother */}
           <Sandbox 
             animation={animation} 
             currentConfig={config} 
@@ -105,34 +104,24 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em]">Close Full Screen</span>
+                <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em]">Exit Full</span>
               </>
             ) : (
               <>
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
-                <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em] hidden sm:inline">Full Screen</span>
+                <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] sm:tracking-[0.4em]">Full Preview</span>
               </>
             )}
           </button>
         </div>
 
-        {/* Viewport Accents - Hidden in Fullscreen */}
+        {/* Viewport Accents */}
         {!isFullScreen && (
           <>
-            <div className="absolute inset-0 border-[30px] border-black pointer-events-none z-40 hidden xl:block"></div>
+            <div className="absolute inset-0 border-[20px] lg:border-[30px] border-black pointer-events-none z-40"></div>
             <div className="absolute inset-4 lg:inset-8 border border-white/5 pointer-events-none z-40"></div>
-            
-            {/* Bottom Status Bar - Desktop Only */}
-            <div className="absolute bottom-12 left-12 right-12 hidden lg:flex justify-between items-end pointer-events-none z-40">
-               <div className="flex flex-col gap-1">
-                 <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.8em]">Unit Output</span>
-                 <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Active Render // 60 FPS</span>
-               </div>
-               <div className="h-[1px] flex-1 mx-12 bg-white/5 mb-2"></div>
-               <div className="text-[8px] font-mono text-white/20 uppercase tracking-[0.8em]">Coordinate System v4.1</div>
-            </div>
           </>
         )}
       </section>
@@ -141,13 +130,13 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
       <aside 
         className={`bg-[#080808] border-l lg:border-t-0 border-t border-white/[0.05] overflow-y-auto flex flex-col transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isFullScreen 
-            ? 'h-0 w-0 lg:w-0 lg:h-full opacity-0 pointer-events-none' 
-            : 'h-[60vh] w-full lg:h-full lg:w-[480px] opacity-100'
+            ? 'h-0 w-0 opacity-0 pointer-events-none' 
+            : 'h-[55vh] w-full lg:h-full lg:w-[450px] opacity-100'
         } z-[520]`}
       >
         <header className="sticky top-0 z-20 bg-[#080808]/95 backdrop-blur-xl p-6 lg:p-10 border-b border-white/[0.05] flex justify-between items-center">
            <div className="space-y-1">
-             <div className="text-[8px] lg:text-[9px] font-mono text-emerald-500 uppercase tracking-[0.4em] mb-1">Module Online</div>
+             <div className="text-[8px] lg:text-[9px] font-mono text-emerald-500 uppercase tracking-[0.4em] mb-1">Unit Online</div>
              <h2 className="text-xl lg:text-2xl font-heading font-black text-white tracking-tighter uppercase leading-none">{animation.name}</h2>
            </div>
            <div className="flex flex-col items-end gap-1">
@@ -157,86 +146,70 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
         </header>
 
         <div className="flex-1 p-6 lg:p-10 space-y-8 lg:space-y-12">
+          {/* Tech Spec Grid */}
           <div className="grid grid-cols-2 gap-px bg-white/5 border border-white/5">
              <div className="bg-[#0c0c0c] p-4 lg:p-5 flex flex-col gap-1 lg:gap-2">
                 <span className="text-[6px] lg:text-[7px] font-mono text-zinc-600 uppercase tracking-widest">Complexity</span>
                 <span className="text-[9px] lg:text-[10px] font-mono text-white uppercase tracking-wider">{animation.complexity}</span>
              </div>
              <div className="bg-[#0c0c0c] p-4 lg:p-5 flex flex-col gap-1 lg:gap-2">
-                <span className="text-[6px] lg:text-[7px] font-mono text-zinc-600 uppercase tracking-widest">Platform</span>
+                <span className="text-[6px] lg:text-[7px] font-mono text-zinc-600 uppercase tracking-widest">Category</span>
                 <span className="text-[9px] lg:text-[10px] font-mono text-white uppercase tracking-wider">{animation.category}</span>
              </div>
           </div>
 
+          {/* Config Controls */}
           <section className="space-y-8 lg:space-y-12">
             <div className="flex items-center gap-4">
-               <h3 className="text-[9px] lg:text-[10px] font-mono font-black text-white uppercase tracking-[0.4em]">Configuration</h3>
+               <h3 className="text-[9px] lg:text-[10px] font-mono font-black text-white uppercase tracking-[0.4em]">Parameters</h3>
                <div className="h-[1px] flex-1 bg-white/[0.03]"></div>
             </div>
             
             {animation.config?.map((param) => (
-              <div key={param.id} className="space-y-4 lg:space-y-5">
+              <div key={param.id} className="space-y-4">
                 <div className="flex justify-between items-center">
                   <label className="text-[9px] lg:text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em]">{param.label}</label>
-                  <span className="text-[8px] lg:text-[9px] font-mono text-white tracking-widest border border-white/10 px-2 py-1 bg-white/[0.02] shadow-inner">{config[param.id]}</span>
+                  <span className="text-[8px] lg:text-[9px] font-mono text-white tracking-widest border border-white/10 px-2 py-1 bg-white/[0.02]">{config[param.id]}</span>
                 </div>
                 
                 {param.type === 'color' ? (
-                  <div className="relative group p-1 border border-white/[0.03] bg-black">
-                    <input 
-                      type="color" 
-                      value={config[param.id]} 
-                      onChange={(e) => handleConfigChange(param.id, e.target.value)} 
-                      className="w-full h-10 lg:h-12 bg-transparent cursor-pointer p-0 appearance-none outline-none border-none" 
-                    />
-                    <div className="absolute inset-0 pointer-events-none border border-white/0 group-hover:border-white/10 transition-colors"></div>
-                  </div>
+                  <input 
+                    type="color" 
+                    value={config[param.id]} 
+                    onChange={(e) => handleConfigChange(param.id, e.target.value)} 
+                    className="w-full h-10 bg-black cursor-pointer appearance-none border border-white/10" 
+                  />
                 ) : (
-                  <div className="relative pt-2">
-                    <input 
-                      type="range" 
-                      min={param.min} 
-                      max={param.max} 
-                      step={param.step} 
-                      value={config[param.id]} 
-                      onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} 
-                      className="w-full h-[2px] bg-zinc-800 rounded-none appearance-none cursor-pointer accent-white hover:accent-emerald-400 transition-all"
-                    />
-                    <div className="flex justify-between mt-2">
-                       <span className="text-[6px] lg:text-[7px] font-mono text-zinc-700">{param.min}</span>
-                       <span className="text-[6px] lg:text-[7px] font-mono text-zinc-700">{param.max}</span>
-                    </div>
-                  </div>
+                  <input 
+                    type="range" 
+                    min={param.min} 
+                    max={param.max} 
+                    step={param.step} 
+                    value={config[param.id]} 
+                    onChange={(e) => handleConfigChange(param.id, parseFloat(e.target.value))} 
+                    className="w-full h-[2px] bg-zinc-800 rounded-none appearance-none cursor-pointer accent-white"
+                  />
                 )}
               </div>
             ))}
           </section>
 
-          <section className="space-y-6 lg:space-y-8 pt-8 lg:pt-10 border-t border-white/[0.03]">
-             <div className="flex items-center gap-4 mb-4">
-               <h3 className="text-[9px] lg:text-[10px] font-mono font-black text-white uppercase tracking-[0.4em]">Protocol Export</h3>
-               <div className="h-[1px] flex-1 bg-white/[0.03]"></div>
-            </div>
-            
-            <CodeBlock label="Deployable Code" code={generatedHtmlSnippet} language="html" />
-            
+          {/* Code Export */}
+          <section className="space-y-6 pt-8 border-t border-white/[0.03]">
+            <CodeBlock label="Source Code" code={generatedHtmlSnippet} language="html" />
             <button 
               onClick={handleCopyFull} 
-              className={`w-full font-black py-5 lg:py-7 transition-all text-[10px] lg:text-[11px] uppercase tracking-[0.5em] border ${
+              className={`w-full font-black py-5 transition-all text-[10px] uppercase tracking-[0.5em] border ${
                 copied 
                 ? 'bg-emerald-900/10 text-emerald-400 border-emerald-500/20' 
-                : 'bg-white text-black hover:bg-zinc-200 border-white shadow-[0_20px_40px_rgba(255,255,255,0.05)]'
+                : 'bg-white text-black hover:bg-zinc-200 border-white'
               }`}
             >
-              {copied ? 'Buffer Synced ✓' : 'Copy System Specs'}
+              {copied ? 'Copied ✓' : 'Copy Specs'}
             </button>
           </section>
         </div>
       </aside>
-
-      {/* Global Accents */}
-      <div className="fixed top-0 bottom-0 left-0 w-[1px] bg-white/5 pointer-events-none z-[610] hidden sm:block"></div>
-      <div className="fixed top-0 bottom-0 right-0 w-[1px] bg-white/5 pointer-events-none z-[610] hidden sm:block"></div>
     </div>
   );
 };

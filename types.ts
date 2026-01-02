@@ -28,7 +28,7 @@ export interface AnimationEntry {
 }
 
 export interface AppState {
-  view: 'home' | 'gallery' | 'detail';
+  view: 'home' | 'gallery' | 'detail' | 'privacy' | 'terms';
   selectedId: string | null;
   searchQuery: string;
   selectedCategory: Category | 'All';

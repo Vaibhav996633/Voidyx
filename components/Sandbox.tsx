@@ -30,7 +30,24 @@ const Sandbox: React.FC<SandboxProps> = ({ animation, className, isThumbnail = f
         </head>
         <body>
           ${animation.html}
-          <script>(function() { try { ${cleanJs} } catch (err) { console.error(err); } })();</script>
+          <script>
+            (function() { 
+              try { 
+                ${cleanJs} 
+                window.addEventListener('resize', () => {
+                  if (typeof renderer !== 'undefined' && renderer.setSize) {
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                  }
+                  if (typeof camera !== 'undefined' && camera.aspect) {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                  }
+                });
+              } catch (err) { 
+                console.error('Sandbox Execution Error:', err); 
+              } 
+            })();
+          </script>
         </body>
       </html>
     `;
@@ -39,10 +56,9 @@ const Sandbox: React.FC<SandboxProps> = ({ animation, className, isThumbnail = f
   return (
     <div className={`relative w-full h-full overflow-hidden bg-black ${className}`}>
       <iframe 
-        key={`${animation.id}-${configString}`} 
         ref={iframeRef} 
         srcDoc={srcDoc} 
-        className="w-full h-full border-none block" 
+        className="w-full h-full border-none block opacity-0 transition-opacity duration-500" 
         sandbox="allow-scripts"
         onLoad={() => {
           if (iframeRef.current) {

@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { ANIMATIONS } from '../data/animations';
 import { AppState, Category } from '../types';
