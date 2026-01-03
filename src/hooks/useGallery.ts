@@ -1,19 +1,29 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ANIMATIONS } from '../data/animations';
-import type { AnimationEntry, AppState, Category, ConfigParam } from '../types';
-import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import type { AnimationEntry, Category, ConfigParam } from '../types';
 
 type DbAnimationRow = {
   id: string;
+  slug?: string | null;
   name: string;
   category: string;
   description: string | null;
   complexity: string | null;
-  html: string | null;
-  css: string | null;
-  js: string | null;
-  cdn_links: unknown;
-  config: unknown;
+  html?: string | null;
+  css?: string | null;
+  js?: string | null;
+  html_code?: string | null;
+  css_code?: string | null;
+  js_code?: string | null;
+  htmlCode?: string | null;
+  cssCode?: string | null;
+  jsCode?: string | null;
+  cdn_links?: unknown;
+  cdn_urls?: unknown;
+  cdnLinks?: unknown;
+  config?: unknown;
+  config_json?: unknown;
+  configParams?: unknown;
 };
 
 const CATEGORIES: Category[] = ['Background', 'Interactive', 'Particle', 'WebGL', 'Text'];
@@ -41,105 +51,71 @@ const normalizeComplexity = (value: unknown): AnimationEntry['complexity'] => {
     : 'Medium';
 };
 
+const pickString = (row: any, keys: string[]): string => {
+  for (const key of keys) {
+    const value = row?.[key];
+    if (typeof value === 'string') return value;
+  }
+  return '';
+};
+
 const mapRowToEntry = (row: DbAnimationRow): AnimationEntry => {
+  const slug = typeof (row as any).slug === 'string' ? (row as any).slug.trim() : '';
+  const cdnValue = (row as any).cdn_links ?? (row as any).cdn_urls ?? (row as any).cdnLinks;
+  const configValue = (row as any).config ?? (row as any).config_json ?? (row as any).configParams;
   return {
-    id: row.id,
+    id: slug || row.id,
     name: row.name,
     category: normalizeCategory(row.category),
     description: row.description ?? '',
-    html: row.html ?? '',
-    css: row.css ?? '',
-    js: row.js ?? '',
-    cdnLinks: asStringArray(row.cdn_links),
+    html: pickString(row, ['html', 'html_code', 'htmlCode', 'markup', 'markup_html']),
+    css: pickString(row, ['css', 'css_code', 'cssCode', 'styles', 'styles_css']),
+    js: pickString(row, ['js', 'js_code', 'jsCode', 'script', 'script_js']),
+    cdnLinks: asStringArray(cdnValue),
     complexity: normalizeComplexity(row.complexity),
-    config: asConfigArray(row.config),
+    config: asConfigArray(configValue),
   };
 };
 
-export const useGallery = () => {
-  const [state, setState] = useState<AppState>({
-    view: 'home',
-    selectedId: null,
-    searchQuery: '',
-    selectedCategory: 'All',
-  });
-
-  const [animations, setAnimations] = useState<AnimationEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function useGallery() {
+  const [free, setFree] = useState<AnimationEntry[]>([]);
+  const [premium, setPremium] = useState<AnimationEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
+    async function fetchAnimations() {
+      setLoading(true);
 
-    const load = async () => {
-      setIsLoading(true);
+      // Prefer ordering by created_at, but fall back if the column doesn't exist.
+      const [freeAttempt, premiumAttempt] = await Promise.all([
+        supabase.from('animations').select('*').order('created_at', { ascending: false }),
+        supabase.from('premium_animations').select('*').order('created_at', { ascending: false }),
+      ]);
 
-      if (!isSupabaseConfigured || !supabase) {
-        setAnimations(ANIMATIONS);
-        setIsLoading(false);
-        return;
+      const freeRes = freeAttempt.error
+        ? await supabase.from('animations').select('*')
+        : freeAttempt;
+
+      const premiumRes = premiumAttempt.error
+        ? await supabase.from('premium_animations').select('*')
+        : premiumAttempt;
+
+      if (freeRes.error) {
+        // eslint-disable-next-line no-console
+        console.error('[useGallery] Failed to load animations:', freeRes.error);
+      }
+      if (premiumRes.error) {
+        // eslint-disable-next-line no-console
+        console.warn('[useGallery] Failed to load premium_animations (optional):', premiumRes.error);
       }
 
-      const { data, error } = await supabase
-        .from('animations')
-        .select('id,name,category,description,complexity,html,css,js,cdn_links,config')
-        .order('created_at', { ascending: true });
+      setFree(((freeRes.data ?? []) as any[]).map((r) => mapRowToEntry(r as DbAnimationRow)));
+      setPremium(((premiumRes.data ?? []) as any[]).map((r) => mapRowToEntry(r as DbAnimationRow)));
+      setLoading(false);
+    }
 
-      if (cancelled) return;
-
-      if (error || !data) {
-        setAnimations(ANIMATIONS);
-        setIsLoading(false);
-        return;
-      }
-
-      setAnimations((data as DbAnimationRow[]).map(mapRowToEntry));
-      setIsLoading(false);
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
+    fetchAnimations();
   }, []);
 
-  const filteredAnimations = useMemo(() => {
-    return animations.filter(anim => {
-      const matchesSearch = 
-        anim.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-        (anim.description ?? '').toLowerCase().includes(state.searchQuery.toLowerCase());
-      const matchesCategory = 
-        state.selectedCategory === 'All' || anim.category === state.selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [animations, state.searchQuery, state.selectedCategory]);
-
-  const featuredAnimations = useMemo(() => animations.slice(0, 6), [animations]);
-
-  const selectedAnimation = useMemo(() => {
-    return animations.find(a => a.id === state.selectedId);
-  }, [animations, state.selectedId]);
-
-  const setView = (view: AppState['view'], selectedId: string | null = null) => {
-    setState(prev => ({ ...prev, view, selectedId }));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const setSearchQuery = (query: string) => {
-    setState(prev => ({ ...prev, searchQuery: query }));
-  };
-
-  const setCategory = (category: Category | 'All') => {
-    setState(prev => ({ ...prev, selectedCategory: category }));
-  };
-
-  return {
-    state,
-    isLoading,
-    filteredAnimations,
-    featuredAnimations,
-    selectedAnimation,
-    setView,
-    setSearchQuery,
-    setCategory
-  };
-};
+  return { free, premium, loading };
+}

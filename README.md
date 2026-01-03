@@ -18,3 +18,15 @@ View your app in AI Studio: https://ai.studio/apps/drive/12YE8gKJGagdHeEQZ1k6HEY
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+///ADD///
+-- TEMP: allow anyone to insert (DEV ONLY)
+CREATE POLICY "TEMP allow insert"
+ON animations
+FOR INSERT
+WITH CHECK (true);
+
+
+///LOCK///
+DROP POLICY "TEMP allow insert" ON animations;
+

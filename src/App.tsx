@@ -1,125 +1,111 @@
 import React from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import Hero from './components/features/Hero';
-import AnimationCard from './components/AnimationCard';
-import DetailView from './components/DetailView';
-import LegalView from './components/LegalView';
-import { useGallery } from './hooks/useGallery';
-import { Category } from './types';
 
-const CATEGORIES: (Category | 'All')[] = ['All', 'Background', 'Interactive', 'Particle', 'Text'];
+import HomePage from './pages/public/HomePage';
+import GalleryPage from './pages/public/GalleryPage';
+import AnimationDetailPage from './pages/public/AnimationDetailPage';
+import LegalPage from './pages/public/LegalPage';
 
-const App: React.FC = () => {
-  const {
-    state,
-    isLoading,
-    filteredAnimations,
-    featuredAnimations,
-    selectedAnimation,
-    setView,
-    setSearchQuery,
-    setCategory
-  } = useGallery();
+import AdminGate from './components/admin/AdminGate';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminAnimationsListPage from './pages/admin/AdminAnimationsListPage';
+import AdminAnimationFormPage from './pages/admin/AdminAnimationFormPage';
+
+const PublicShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentView = location.pathname.startsWith('/gallery')
+    ? 'gallery'
+    : location.pathname.startsWith('/animations/')
+    ? 'detail'
+    : 'home';
 
   return (
     <div className="min-h-screen bg-[#050505] flex flex-col selection:bg-white selection:text-black">
-      <Navbar currentView={state.view as any} onNavigate={(view) => setView(view as any)} />
-
-      {isLoading ? (
-        <main className="flex-1 flex items-center justify-center px-8 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[400px] bg-gradient-radial from-white/[0.03] to-transparent blur-[120px] animate-pulse"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
-          </div>
-          <div className="relative z-10 text-center space-y-6 animate-fade-in">
-            <p className="text-white/80 font-heading font-black uppercase tracking-tighter text-5xl">VOIDYX</p>
-            <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-[0.8em]">Initializing Vault // Syncing Units</p>
-            <div className="w-64 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto"></div>
-          </div>
-        </main>
-      ) : (
-        <>
-          {state.view === 'home' && (
-            <Hero
-              featuredAnimations={featuredAnimations}
-              onSelect={(id) => setView('detail', id)}
-              onEnterGallery={() => setView('gallery')}
-            />
-          )}
-
-          {state.view === 'gallery' && (
-            <main className="flex-1 pt-48 pb-40 px-8 animate-fade-in relative z-10">
-              <div className="max-w-7xl mx-auto space-y-24">
-                <div className="flex flex-col space-y-12">
-                  <button
-                    onClick={() => setView('home')}
-                    className="group flex items-center gap-4 text-zinc-600 hover:text-white transition-colors w-fit"
-                  >
-                    <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span className="text-[10px] font-mono uppercase tracking-[0.4em]">Back to Hub</span>
-                  </button>
-
-                  <div className="flex flex-col md:flex-row justify-between items-end gap-10 border-b border-white/[0.03] pb-12">
-                    <div className="space-y-4">
-                      <h1 className="text-8xl font-heading font-black text-white uppercase tracking-tighter">Vault</h1>
-                      <p className="text-zinc-meta text-xl font-light tracking-tight italic">Registry of Generative Units.</p>
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-8 items-center w-full md:w-auto">
-                      <div className="flex items-center gap-1 bg-white/[0.02] border border-white/[0.05] p-1 rounded-none overflow-x-auto no-scrollbar max-w-full">
-                        {CATEGORIES.map((cat) => (
-                          <button
-                            key={cat}
-                            onClick={() => setCategory(cat)}
-                            className={`px-8 py-3 text-[9px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap ${state.selectedCategory === cat ? 'bg-white text-black' : 'text-zinc-meta hover:text-white'}`}
-                          >
-                            {cat}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="relative group w-full md:w-80">
-                        <input
-                          type="text"
-                          placeholder="Search library..."
-                          value={state.searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="bg-black border border-white/[0.05] rounded-none px-8 py-4 text-[11px] font-light tracking-widest text-white focus:border-white/40 outline-none w-full transition-all"
-                        />
-                        <div className="absolute right-8 top-1/2 -translate-y-1/2 text-zinc-dim pointer-events-none text-[9px] font-mono">/SEARCH</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                  {filteredAnimations.length > 0 ? (
-                    filteredAnimations.map((anim) => (
-                      <AnimationCard key={anim.id} animation={anim} onClick={(id) => setView('detail', id)} />
-                    ))
-                  ) : (
-                    <div className="col-span-full py-60 text-center space-y-4">
-                      <p className="text-zinc-dim font-mono text-[11px] uppercase tracking-[0.8em]">Unit Not Found // Reset Search Parameters.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </main>
-          )}
-
-          {state.view === 'detail' && selectedAnimation && (
-            <DetailView animation={selectedAnimation} onBack={() => setView('gallery')} />
-          )}
-
-          {(state.view === 'privacy' || state.view === 'terms') && (
-            <LegalView type={state.view} onBack={() => setView('home')} />
-          )}
-        </>
-      )}
-
-      <Footer onNavigate={(view) => setView(view as any)} />
+      <Navbar currentView={currentView as any} onNavigate={(v) => navigate(v === 'gallery' ? '/gallery' : '/')} />
+      {children}
+      <Footer onNavigate={(v) => navigate(v === 'privacy' ? '/privacy' : '/terms')} />
     </div>
+  );
+};
+
+const AdminAliasRedirect: React.FC = () => {
+  const { pathname, search, hash } = useLocation();
+  const rest = pathname.replace(/^\/admin(\/|$)/, '/');
+  const targetPath = rest === '/' ? '/voidyx-admin/login' : `/voidyx-admin${rest}`;
+  return <Navigate to={`${targetPath}${search}${hash}`} replace />;
+};
+
+const App: React.FC = () => {
+  return (
+    <Routes>
+      {/* Alias: redirect /admin -> hidden admin route */}
+      <Route path="/admin" element={<Navigate to="/voidyx-admin/login" replace />} />
+      <Route path="/admin/*" element={<AdminAliasRedirect />} />
+
+      {/* Public mode */}
+      <Route
+        path="/"
+        element={
+          <PublicShell>
+            <HomePage />
+          </PublicShell>
+        }
+      />
+      <Route
+        path="/gallery"
+        element={
+          <PublicShell>
+            <GalleryPage />
+          </PublicShell>
+        }
+      />
+      <Route
+        path="/animations/:id"
+        element={
+          <PublicShell>
+            <AnimationDetailPage />
+          </PublicShell>
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <PublicShell>
+            <LegalPage type="privacy" />
+          </PublicShell>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <PublicShell>
+            <LegalPage type="terms" />
+          </PublicShell>
+        }
+      />
+
+      {/* Hidden admin mode (no links in public UI) */}
+      <Route path="/voidyx-admin/login" element={<AdminLoginPage />} />
+      <Route
+        path="/voidyx-admin"
+        element={
+          <AdminGate>
+            <AdminLayout />
+          </AdminGate>
+        }
+      >
+        <Route path="dashboard" element={<AdminDashboardPage />} />
+        <Route path="animations" element={<AdminAnimationsListPage />} />
+        <Route path="animations/new" element={<AdminAnimationFormPage />} />
+        <Route path="animations/:id/edit" element={<AdminAnimationFormPage />} />
+      </Route>
+    </Routes>
   );
 };
 

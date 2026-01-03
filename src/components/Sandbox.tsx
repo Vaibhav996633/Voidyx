@@ -11,6 +11,10 @@ interface SandboxProps {
 const Sandbox: React.FC<SandboxProps> = ({ animation, className, isThumbnail = false, currentConfig }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const configString = useMemo(() => JSON.stringify(currentConfig || {}), [currentConfig]);
+  const hasConfig = useMemo(() => {
+    if (!currentConfig) return false;
+    return Object.keys(currentConfig).length > 0;
+  }, [currentConfig]);
 
   const srcDoc = useMemo(() => {
     const scripts = (animation.cdnLinks || []).map(link => `<script src="${link}"></script>`).join('\n');
@@ -26,7 +30,7 @@ const Sandbox: React.FC<SandboxProps> = ({ animation, className, isThumbnail = f
             ${isThumbnail ? 'body { pointer-events: none; }' : ''}
           </style>
           ${scripts}
-          <script>window.VANTA_CONFIG = ${configString};</script>
+          ${hasConfig ? `<script>window.VANTA_CONFIG = ${configString};</script>` : ''}
         </head>
         <body>
           ${animation.html}
@@ -51,7 +55,7 @@ const Sandbox: React.FC<SandboxProps> = ({ animation, className, isThumbnail = f
         </body>
       </html>
     `;
-  }, [animation.id, configString, isThumbnail]);
+  }, [animation.id, configString, hasConfig, isThumbnail]);
 
   return (
     <div className={`relative w-full h-full overflow-hidden bg-black ${className}`}>

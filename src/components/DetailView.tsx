@@ -36,6 +36,7 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
 
   const generatedHtmlSnippet = useMemo(() => {
     const scripts = (animation.cdnLinks || []).map(link => `<script src="${link}"></script>`).join('\n  ');
+    const hasConfig = config && Object.keys(config).length > 0;
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -48,7 +49,7 @@ const DetailView: React.FC<DetailViewProps> = ({ animation, onBack }) => {
 <body>
   ${animation.html}
   <script>
-    window.VANTA_CONFIG = ${JSON.stringify(config, null, 2)};
+    ${hasConfig ? `window.VANTA_CONFIG = ${JSON.stringify(config, null, 2)};` : ''}
     (function() { ${cleanJs} })();
   </script>
 </body>

@@ -6,9 +6,10 @@ import Sandbox from './Sandbox';
 interface AnimationCardProps {
   animation: AnimationEntry;
   onClick: (id: string) => void;
+  premium?: boolean;
 }
 
-const AnimationCard: React.FC<AnimationCardProps> = ({ animation, onClick }) => {
+const AnimationCard: React.FC<AnimationCardProps> = ({ animation, onClick, premium }) => {
   const defaultConfig = Object.fromEntries(animation.config?.map(c => [c.id, c.default]) || []);
 
   return (
@@ -17,6 +18,14 @@ const AnimationCard: React.FC<AnimationCardProps> = ({ animation, onClick }) => 
       className="group relative flex flex-col bg-black border border-white/[0.05] rounded-none overflow-hidden cursor-pointer transition-all duration-700 hover:border-white/30 hover:shadow-[0_0_50px_rgba(255,255,255,0.03)]"
     >
       <div className="aspect-[16/9] w-full bg-[#050505] relative overflow-hidden">
+        {premium && (
+          <div className="absolute top-2 right-2 z-50 flex items-center gap-1">
+            <svg className="w-5 h-5 text-yellow-400 drop-shadow" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.33L10 13.27l-4.77 2.51.91-5.33-3.87-3.77 5.34-.78L10 2z" />
+            </svg>
+            <span className="text-[10px] font-bold text-yellow-400 uppercase">Premium</span>
+          </div>
+        )}
         {/* Cinematic Scanline Overlay */}
         <div className="absolute inset-0 z-20 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
         
