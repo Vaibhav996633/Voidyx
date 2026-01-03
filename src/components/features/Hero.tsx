@@ -29,8 +29,8 @@ const CinematicTitle: React.FC<{ text: string }> = ({ text }) => {
         clearInterval(interval);
         setIsLocked(true);
       }
-      iteration += 1 / 3;
-    }, 50);
+      iteration += 1 / 4; // slower progression for a more deliberate reveal
+    }, 75);
     return () => clearInterval(interval);
   }, [text]);
 

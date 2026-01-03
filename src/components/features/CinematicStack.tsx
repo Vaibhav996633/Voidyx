@@ -13,6 +13,22 @@ const CinematicStack: React.FC<CinematicStackProps> = ({ animations, onSelect })
   const autoPlayRef = useRef<number>(null);
   const [isMobile, setIsMobile] = useState(false);
 
+  if (animations.length === 0) {
+    return (
+      <div className="relative w-full h-[350px] sm:h-[500px] lg:h-[600px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[400px] bg-gradient-radial from-white/[0.03] to-transparent blur-[100px]"></div>
+          <div className="absolute bottom-10 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-10"></div>
+        </div>
+        <div className="relative z-10 text-center space-y-4">
+          <p className="text-zinc-dim font-mono text-[10px] uppercase tracking-[0.8em]">No Units Available</p>
+          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto"></div>
+          <p className="text-zinc-500 text-sm font-light tracking-wide">Seed the Supabase animations table to enable previews.</p>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 640px)');
 
